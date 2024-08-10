@@ -13,4 +13,9 @@ app.use(e.urlencoded())
 app.use(e.static("public"))
 app.use(cookieParser())
 
+//importing routes
+import userRouter from "./routes/user.routes";
+app.use("/api/v1/users", userRouter);
+
+
 export {app}
