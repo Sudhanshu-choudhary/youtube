@@ -4,23 +4,21 @@ import {User} from "../models/user.models.js";
 import {uploadOnCloudinary} from "../utils/cloudinary.js";
 import {apiResponse} from "../utils/apiResponse.js";
 
-const registerUser = asyncHandler(async (req, res) =>{
-  res.status(200).json({
-    message: "ok"
-  })
 
-  const {fullName, email, username, password} = req.body
+const registerUser = asyncHandler(async (req, res) =>{
+
+  const {fullname, email, username, password} = req.body
   console.log(email, password);
 
 
   //validations
   if(
-    [fullName, username, password, email].some((field)=> field?.trim() == "")
+    [fullname, username, password, email].some((field)=> field?.trim() == "")
     ){
       throw new apiError(404, `${field} is required`);
   }
 
-  const existedUser = User.findOne({
+  const existedUser = await User.findOne({
     $or: [{username}, {email}]
   })
 
@@ -29,21 +27,26 @@ const registerUser = asyncHandler(async (req, res) =>{
   }
 
   const avatarLocalPath = req.files?.avatar[0]?.path;
-  const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  //const coverImageLocalPath = req.files?.coverImage[0]?.path;
+  let coverImageLocalPath;
+  if(req.files && Array.isArray(req.files.coverImage) && req.files.coverImage.length>0){
+    coverImageLocalPath = req.files.coverImage[0].path;
+  }
   
   if(!avatarLocalPath){
-    throw new apiError(404, "avatar is must ");
+    throw new apiError(404, "avatar path is must ");
   }
 
   const avatar =await uploadOnCloudinary(avatarLocalPath);
   const coverImage =await uploadOnCloudinary(coverImageLocalPath);
+  
 
   if(!avatar){
-    throw new apiError(404, "avatar is must ");
+    throw new apiError(404, "avatar file is required ");
   }
   
   const user = await User.create({
-    fullName,
+    fullname,
     avatar: avatar.url,
     coverImage: coverImage?.url || "",
     email,
@@ -55,7 +58,7 @@ const registerUser = asyncHandler(async (req, res) =>{
 
   if(!createdUser){
     throw new apiError(500, "something went wrong");
-  }
+  }  
 
   return res.status(201).json(
     new apiResponse(200, createdUser, "user registered successfully")
