@@ -128,7 +128,7 @@ const newAccessTokenGeneration = asyncHandler(async (req, res)=>{
   res.status(200)
   .cookie("AccessToken", newAccessToken, Options)
   .cookie("RefreshToken", newRefreshToken, Options)
-  .json(new apiResponse(200,{newAccessToken, newRefreshToken}, "session reset complete"))
+  .json(new apiResponse(200,{Tokens: newAccessToken, newRefreshToken}, "session reset complete"))
 
 })
 

@@ -5,7 +5,7 @@ import jwt from "jsonwebtoken";
 
 export const newAccessToken = asyncHandler(async (req, _, next)=>{
   try {
-    const incomingRefreshtoken = req.cookies?.RefreshToken || req.body?.RefreshToken ;
+    const incomingRefreshtoken = req.cookies.RefreshToken || req.body.RefreshToken ;
   
     if(!incomingRefreshtoken){
       throw new apiError(401, "you dont have a refresh token ");
@@ -17,8 +17,8 @@ export const newAccessToken = asyncHandler(async (req, _, next)=>{
     if(!user){
       throw new apiError(401, "invalid refresh token");
     }
-  
-    if(incomingRefreshtoken != user?.RefreshToken){
+
+    if(incomingRefreshtoken !== user?.refreshToken){
       throw new apiError(401, "invalid access from user")
     }
   
