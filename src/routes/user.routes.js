@@ -1,6 +1,8 @@
 import e from "express";
-import { registerUser } from "../controllers/user.controller.js";
+import { loginUser, logoutUser, newAccessTokenGeneration, registerUser } from "../controllers/user.controller.js";
 import {upload} from "../middlewares/multer.middleware.js"
+import  {verifyJWT}  from "../middlewares/auth.middleware.js";
+import { newAccessToken } from "../middlewares/newAccessToken.middleware.js";
 
 const router = e.Router();
 
@@ -15,7 +17,11 @@ router.route("/register").post(
       maxCount: 1
     }
   ]),
-   registerUser
-  )
+  registerUser
+)
+
+router.route("/login").post(loginUser)
+router.route("/logout").post(verifyJWT, logoutUser)
+router.route("/newToken-generation").post(newAccessToken, newAccessTokenGeneration)
 
 export default router;
